@@ -1,8 +1,15 @@
-import type { CSSProperties, FC, PropsWithChildren } from "react";
+import {
+  type CSSProperties,
+  type FC,
+  type PropsWithChildren,
+  useEffect,
+} from "react";
+import { useRevealed } from "../use-revealed";
 
 type Props = Partial<{
   id: string;
   hook: string;
+  onHook: () => void;
   hidden: boolean;
   uncounted: boolean;
   background: Partial<{
@@ -44,8 +51,23 @@ export const Slide: FC<Props> = ({
   hidden,
   uncounted,
   hook,
+  onHook,
   id,
 }) => {
+  const revealed = useRevealed();
+
+  useEffect(() => {
+    if (hook) {
+      debugger;
+      revealed?.on(hook, () => {
+        debugger;
+        if (onHook) {
+          onHook();
+        }
+      });
+    }
+  }, [hook, revealed, onHook]);
+
   return (
     <section
       id={id}
