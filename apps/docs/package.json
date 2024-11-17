@@ -1,0 +1,33 @@
+{
+  "name": "@dreitagebart/docs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "check": "biome check ./src",
+    "check:fix": "biome check --write ./src",
+    "check:fix:unsafe": "biome check --write --unsafe ./src"
+  },
+  "dependencies": {
+    "@dreitagebart/revealed": "workspace:*",
+    "@mantine/core": "^7.14.1",
+    "@mantine/hooks": "^7.14.1",
+    "@tabler/icons-react": "^3.22.0",
+    "next": "15.0.3",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0-rc-66855b96-20241106"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "postcss": "^8.4.49",
+    "postcss-preset-mantine": "^1.17.0",
+    "postcss-simple-vars": "^7.0.1",
+    "typescript": "^5"
+  }
+}
