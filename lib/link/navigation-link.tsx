@@ -1,21 +1,45 @@
-import type { FC } from "react";
+import clsx from "clsx";
+import type { ComponentProps, FC, ReactNode } from "react";
+
+import { useRevealed } from "../use-revealed";
 
 type Props = {
   direction: "left" | "right" | "up" | "down" | "prev" | "next";
-};
+  children: ReactNode;
+} & ComponentProps<"button">;
 
-export const NavigationLink: FC<Props> = ({ direction }) => {
-  return direction === "left" ? (
-    <button type="button" className="navigate-left" />
-  ) : direction === "right" ? (
-    <button type="button" className="navigate-right" />
-  ) : direction === "up" ? (
-    <button type="button" className="navigate-up" />
-  ) : direction === "down" ? (
-    <button type="button" className="navigate-down" />
-  ) : direction === "prev" ? (
-    <button type="button" className="navigate-prev" />
-  ) : direction === "next" ? (
-    <button type="button" className="navigate-next" />
-  ) : null;
+export const NavigationLink: FC<Props> = ({ direction, children, ...rest }) => {
+  const revealed = useRevealed();
+
+  return (
+    <button
+      type="button"
+      onClick={() =>
+        direction === "left"
+          ? revealed?.navigateLeft()
+          : direction === "right"
+          ? revealed?.navigateRight()
+          : direction === "up"
+          ? revealed?.navigateUp()
+          : direction === "down"
+          ? revealed?.navigateDown()
+          : direction === "next"
+          ? revealed?.navigateNext()
+          : direction === "prev"
+          ? revealed?.navigatePrev()
+          : null
+      }
+      className={clsx({
+        "navigate-left": direction === "left",
+        "navigate-right": direction === "right",
+        "navigate-up": direction === "up",
+        "navigate-down": direction === "down",
+        "navigate-prev": direction === "prev",
+        "navigate-next": direction === "next",
+      })}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
 };

@@ -6,3 +6,6 @@ export * from "./slide";
 export * from "./note";
 export * from "./text";
 export * from "./image";
+export * from "./title";
+export * from "./markdown";
+export * from "./media";

@@ -1,19 +1,19 @@
+import clsx from "clsx";
 import type { ComponentProps, FC } from "react";
 
-type ImageDefaultProps = {
+type Props = {
   stretch?: boolean;
-  src: string;
-  alt: string;
-};
+} & ComponentProps<"img">;
 
-type Props = ImageDefaultProps &
-  Omit<ComponentProps<"img">, keyof ImageDefaultProps>;
+export const Image: FC<Props> = ({ stretch, alt, ...rest }) => {
+  const className = clsx(
+    { [rest.className as string]: Boolean(rest.className) },
+    { "r-stretch": stretch }
+  );
+  const props = {
+    ...rest,
+    className,
+  };
 
-export const Image: FC<Props> = ({ src, alt, stretch, ...rest }) => {
-  const className = `${rest.className ? rest.className : ""}${
-    stretch ? " r-stretch" : ""
-  }`.trim();
-  const props = { ...rest, className };
-
-  return <img {...props} alt={alt} src={src} />;
+  return <img {...props} alt={alt} />;
 };

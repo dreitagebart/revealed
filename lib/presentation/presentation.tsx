@@ -1,15 +1,43 @@
-import { type FC, type PropsWithChildren, useEffect, useRef } from "react";
+import "reveal.js/dist/reveal.css";
+import {
+  type FC,
+  type PropsWithChildren,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { Helmet, HelmetProvider } from "react-helmet-async";
 import Reveal from "reveal.js";
 import RevealHighlight from "reveal.js/plugin/highlight/highlight.esm";
+import RevealMarkdown from "reveal.js/plugin/markdown/markdown.esm";
 import RevealNotes from "reveal.js/plugin/notes/notes.esm";
 import RevealSearch from "reveal.js/plugin/search/search.esm";
 import RevealZoom from "reveal.js/plugin/zoom/zoom.esm";
+
 import { RevealedContext } from "../use-revealed";
 
 type Props = Partial<{
+  theme?: (typeof themes)[number];
   options: Partial<Reveal.Options>;
 }> &
   PropsWithChildren;
+
+const themes = [
+  "black",
+  "white",
+  "league",
+  "beige",
+  "sky",
+  "night",
+  "serif",
+  "simple",
+  "solarized",
+  "blood",
+  "moon",
+  "night",
+  "none",
+] as const;
 
 const defaultOptions: Reveal.Options = {
   controls: true,
@@ -85,31 +113,46 @@ const defaultOptions: Reveal.Options = {
 
 export const Presentation: FC<Props> = ({
   children,
+  theme = "black",
   options = defaultOptions,
 }) => {
-  const deckDivRef = useRef<HTMLDivElement>(null); // reference to deck container div
-  const deckRef = useRef<Reveal.Api | null>(null); // reference to deck reveal instance
+  const revealDivRef = useRef<HTMLDivElement>(null); // reference to deck container div
+  const revealRef = useRef<Reveal.Api | null>(null); // reference to deck reveal instance
+  const [visible, setVisible] = useState(false);
+
+  useLayoutEffect(() => {
+    if (revealRef.current?.isReady()) {
+      console.log("adjust layout...");
+      revealRef.current.layout();
+    }
+  });
 
   useEffect(() => {
-    // Prevents double initialization in strict mode
-    if (deckRef.current) return;
+    if (revealRef.current) return;
 
     // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    deckRef.current = new Reveal(deckDivRef.current!, options);
+    revealRef.current = new Reveal(revealDivRef.current!, options);
 
-    deckRef.current
+    revealRef.current
       .initialize({
-        plugins: [RevealHighlight, RevealNotes, RevealZoom, RevealSearch],
+        plugins: [
+          RevealHighlight,
+          RevealMarkdown,
+          RevealNotes,
+          RevealZoom,
+          RevealSearch,
+        ],
       })
       .then(() => {
+        setVisible(true);
         // nothing to do here now
       });
 
     return () => {
       try {
-        if (deckRef.current) {
-          deckRef.current.destroy();
-          deckRef.current = null;
+        if (revealRef.current) {
+          revealRef.current.destroy();
+          revealRef.current = null;
         }
       } catch (e) {
         console.warn("Reveal.js destroy call failed.", e);
@@ -118,10 +161,34 @@ export const Presentation: FC<Props> = ({
   }, [options]);
 
   return (
-    <RevealedContext.Provider value={deckRef.current}>
-      <div className="reveal" ref={deckDivRef}>
-        <div className="slides">{children}</div>
-      </div>
-    </RevealedContext.Provider>
+    <HelmetProvider>
+      <RevealedContext.Provider value={revealRef.current}>
+        <Helmet>
+          {theme !== "none" && themes.includes(theme) ? (
+            <link
+              rel="stylesheet"
+              href={`../../node_modules/reveal.js/dist/theme/${theme}.css`}
+            />
+          ) : null}
+        </Helmet>
+        <div
+          className="reveal"
+          style={{
+            height: "100vh",
+          }}
+          ref={revealDivRef}
+        >
+          <div
+            className="slides"
+            style={{
+              transition: "opacity 600ms ease-in-out",
+              opacity: visible ? 1 : 0,
+            }}
+          >
+            {children}
+          </div>
+        </div>
+      </RevealedContext.Provider>
+    </HelmetProvider>
   );
 };

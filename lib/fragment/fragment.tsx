@@ -1,25 +1,26 @@
-import { type FC, type PropsWithChildren, cloneElement } from "react";
+import clsx from "clsx";
+import {
+  type ComponentProps,
+  type ElementType,
+  type ReactNode,
+  cloneElement,
+} from "react";
 
-// fade-out	Start visible, fade out
-// fade-up	Slide up while fading in
-// fade-down	Slide down while fading in
-// fade-left	Slide left while fading in
-// fade-right	Slide right while fading in
-// fade-in-then-out	Fades in, then out on the next step
-// current-visible	Fades in, then out on the next step
-// fade-in-then-semi-out	Fades in, then to 50% on the next step
-// grow	Scale up
-// semi-fade-out	Fade out to 50%
-// shrink	Scale down
-// strike	Strike through
-// highlight-red	Turn text red
-// highlight-green	Turn text green
-// highlight-blue	Turn text blue
-// highlight-current-red	Turn text red, then back to original on next step
-// highlight-current-green	Turn text green, then back to original on next step
-// highlight-current-blue	Turn text blue, then back to original on next step
+type ComponentDefaultAsType = typeof ComponentDefaultAsType;
+
+type ComponentDefaultProps<E extends ElementType> = {
+  effect?: FragmentEffects | Array<FragmentEffects>;
+  as?: E;
+  children: ReactNode;
+};
+
+type Props<E extends ElementType> = ComponentDefaultProps<E> &
+  Omit<ComponentProps<E>, keyof ComponentDefaultProps<E>>;
+
+const ComponentDefaultAsType = "div" as const;
 
 const EffectMap = {
+  fadeIn: "fade-in",
   fadeOut: "fade-out",
   fadeUp: "fade-up",
   fadeDown: "fade-down",
@@ -42,13 +43,29 @@ const EffectMap = {
 
 type FragmentEffects = keyof typeof EffectMap;
 
-type Props = {
-  effect: FragmentEffects | Array<FragmentEffects>;
-} & PropsWithChildren;
+// type Props = {
+//   as?:
+//   effect?: FragmentEffects | Array<FragmentEffects>;
+// } & PropsWithChildren;
 
-export const Fragment: FC<Props> = ({ children, effect }) => {
+export const Fragment = <E extends ElementType = ComponentDefaultAsType>({
+  as,
+  effect = "fadeIn",
+  children,
+  ...rest
+}: Props<E>) => {
+  const Tag = as || ComponentDefaultAsType;
+
   if (typeof effect === "string") {
-    return <p className={`fragment ${EffectMap[effect]}`}>{children}</p>;
+    return (
+      <Tag
+        className={clsx("fragment", EffectMap[effect], {
+          [rest.className]: Boolean(rest.className),
+        })}
+      >
+        {children}
+      </Tag>
+    );
   }
 
   const effects = [...effect];
@@ -56,7 +73,11 @@ export const Fragment: FC<Props> = ({ children, effect }) => {
   effects.reverse();
 
   return (
-    <p className={`fragment ${EffectMap[effect[0]]}`}>
+    <Tag
+      className={clsx("fragment", EffectMap[effect[0]], {
+        [rest.className]: Boolean(rest.className),
+      })}
+    >
       {effects.reduce((acc, eff, index) => {
         const effectName = EffectMap[eff];
         const accumulated = cloneElement(acc, {
@@ -64,11 +85,11 @@ export const Fragment: FC<Props> = ({ children, effect }) => {
         });
 
         return (
-          <span key={eff} className={`fragment ${effectName}`}>
+          <span key={eff} className={clsx("fragment", effectName)}>
             {accumulated}
           </span>
         );
       }, <span />)}
-    </p>
+    </Tag>
   );
 };

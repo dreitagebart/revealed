@@ -1,15 +1,9 @@
-import {
-  type CSSProperties,
-  type FC,
-  type PropsWithChildren,
-  useEffect,
-} from "react";
-import { useRevealed } from "../use-revealed";
+import type { CSSProperties, FC, PropsWithChildren } from "react";
 
 type Props = Partial<{
   id: string;
-  hook: string;
-  onHook: () => void;
+  // hook: string;
+  // onHook: () => void;
   hidden: boolean;
   uncounted: boolean;
   background: Partial<{
@@ -50,23 +44,23 @@ export const Slide: FC<Props> = ({
   background,
   hidden,
   uncounted,
-  hook,
-  onHook,
+  // hook,
+  // onHook,
   id,
 }) => {
-  const revealed = useRevealed();
+  // const revealed = useRevealed();
 
-  useEffect(() => {
-    if (hook) {
-      debugger;
-      revealed?.on(hook, () => {
-        debugger;
-        if (onHook) {
-          onHook();
-        }
-      });
-    }
-  }, [hook, revealed, onHook]);
+  // useEffect(() => {
+  //   if (hook) {
+  //     debugger;
+  //     revealed?.on(hook, () => {
+  //       debugger;
+  //       if (onHook) {
+  //         onHook();
+  //       }
+  //     });
+  //   }
+  // }, [hook, revealed, onHook]);
 
   return (
     <section
@@ -78,7 +72,7 @@ export const Slide: FC<Props> = ({
             }`
           : transition
       }
-      data-state={hook}
+      // data-state={hook}
       data-visibility={hidden ? "hidden" : uncounted ? "uncounted" : undefined}
       data-background-video={background?.video?.url}
       data-background-video-loop={background?.video?.loop}
